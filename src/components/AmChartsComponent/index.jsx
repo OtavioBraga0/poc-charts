@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -12,9 +12,7 @@ am4core.useTheme(am4themes_animated);
 export const AmChartsComponent = () => {
     const amChart = useRef()
 
-    const point = useRef() 
-
-    const [prevBullet, setPrevBullet] = useState()
+    const point = useRef()
 
     useEffect(() => {
         amChart.current = am4core.create("chartdiv", am4charts.XYChart)
@@ -177,43 +175,23 @@ export const AmChartsComponent = () => {
             endLine.valign = "middle";
             endLine.zIndex = 1
             
-            const bullet = new am4charts.CircleBullet()
-            bullet.stroke = am4core.color(colors.blue500)
-            bullet.fill = am4core.color(colors.sand500)
-            bullet.defaultState.properties.opacity = 0
-
-            // bullet.events.on("hit", ({target}) => {
-            //     setPrevBullet(prev => {
-            //         console.log('prev ', prev);
-            //         if (prev) {
-            //             prev.opacity = 0
-            //         }
-            //         console.log('target', target);
-            //         target.opacity = 1
-            //         return target
-            //     })
-            // }, this)
-
+            const plot = series.createChild(am4charts.CircleBullet)
+            plot.stroke = am4core.color(colors.blue500)
+            plot.fill = am4core.color(colors.sand500)
+            plot.isMeasured = false
             
             series.segments.template.interactionsEnabled = true
-            series.segments.template.events.on("hit", ({target, ...rest}) => {
-                const data = target.dataItem.component.tooltipDataItem.dataContext;
-                const clones = target.dataItem.component.bullets.values[0].clones.values
-
-                console.log(target);
-
-                point.current = data
+            series.segments.template.events.on("hit", ({target}) => {
+                const {dataContext, point} = target.dataItem.component.tooltipDataItem;
+                plot.moveTo(point)
+                point.current = dataContext
             },this);
 
-            series.segments.template.events.on("drag", ({target, event, }) => {
-                event.stopPropagation()
-                event.preventDefault()
+            series.segments.template.events.on("drag", ({target }) => {
+                target.moveTo({x: 0, y: 0})
                 const data = target.dataItem.component.tooltipDataItem.dataContext;
                 point.current = data
             },this)
-
-
-            series.bullets.push(bullet)
         }
     }, [amChart])
 
