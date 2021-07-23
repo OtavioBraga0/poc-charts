@@ -190,11 +190,8 @@ export const AmChartsComponent = () => {
         endLine.valign = "middle";
         endLine.zIndex = 1;
 
-        const plot = series.createChild(am4charts.CircleBullet);
-        plot.stroke = am4core.color(colors.blue500);
-        plot.width = 14;
-        plot.fill = am4core.color(colors.sand500);
-
+        const scrubber = new am4charts.CircleBullet();
+      
         // const arrowRight = plot.createChild(am4charts.CircleBullet)
         // arrowRight.fill = am4core.color("white")
         // arrowRight.strokeWidth = 0
@@ -218,31 +215,34 @@ export const AmChartsComponent = () => {
         // arrowLeftImage.stroke = am4core.color(colors.blue500)`
 
         series.bullets.create(am4charts.Bullet)
-        chart.maskBullets = false;
 
         chart.plotContainer.events.on("hit", ({target, point}) => {
           const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
           if (series.bullets.values[0]) {
             const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
             if (bullet) {
-              console.log(bullet);
-              const {x, y} = bullet
-              plot.moveTo({x, y})
+              // console.log('');
+              bullet.setElement(scrubber.element)
+              bullet.stroke = am4core.color(colors.blue500);
+              bullet.width = 14;
+              bullet.fill = am4core.color(colors.sand500);
             }
           }
         }, this)
 
-        scrollbarX.events.on("positionchanged", ({ target }) => {
-          const dataItem = valueAxis.getSeriesDataItem(target.series.values[0], plot)
-          if (series.bullets.values[0]) {
-            const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
-            if (bullet) {
-              console.log(bullet);
-              const {x, y} = bullet
-              plot.moveTo({x, y})
-            }
-          }
-        },this);
+        // chart.plotContainer.events.on("drag", ({target, point}) => {
+        //   const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
+        //   if (series.bullets.values[0]) {
+        //     const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
+        //     if (bullet) {
+        //       console.log('');
+        //       bullet.setElement(scrubber.element)
+        //       bullet.stroke = am4core.color(colors.blue500);
+        //       bullet.width = 14;
+        //       bullet.fill = am4core.color(colors.sand500);
+        //     }
+        //   }
+        // }, this)
       }
     }
   }, [amChart]);

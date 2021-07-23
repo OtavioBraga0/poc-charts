@@ -3,7 +3,6 @@
  * PLOT BULLETS IN ALL POINT IN SERIES
  *
  */
-
 // series.dummyData = {...series.dummyData, selectedBullet: null}
 // chart.plotContainer.events.on("hit", ({target, point}) => {
 //     const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
@@ -24,36 +23,20 @@
 //     if (series.bullets.values[0]) {
 //       const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
 //       if (bullet) {
-//         const {x, y} = bullet.group
+//         console.log(bullet);
+//         const {x, y} = bullet
 //         plot.moveTo({x, y})
 //       }
 //     }
 //   }, this)
 
-/*
- *
- * ON SCROLLBAR RANGE CHANGED
- *
- */
-
-// scrollbarX.events.on(
-//     "rangechanged",
-//     ({ target }: { target: any }) => {
-//       const dataItem = valueAxis.getSeriesDataItem(
-//         target.baseSprite.series.values[0],
-//         plot as any
-//       );
-//       if (dataItem && dataItem.component) {
-//         const bullet = series.bullets.values[0].clones.getIndex(
-//           dataItem.component.tooltipDataItem.index
-//         ) as am4charts.Bullet;
-
-//         if (bullet) {
-//           const { x, y } = bullet.group;
-
-//           plot.moveTo({ x, y });
-//         }
+//   scrollbarX.events.on("rangechanged", ({ target }) => {
+//     const dataItem = valueAxis.getSeriesDataItem(target.series.values[0], plot)
+//     if (series.bullets.values[0]) {
+//       const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
+//       if (bullet) {
+//         const {x, y} = bullet
+//         plot.moveTo({x, y})
 //       }
-//     },
-//     this
-//   );
+//     }
+//   },this);
