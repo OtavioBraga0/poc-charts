@@ -191,7 +191,7 @@ export const AmChartsComponent = () => {
         endLine.zIndex = 1;
 
         const scrubber = new am4charts.CircleBullet();
-      
+
         // const arrowRight = plot.createChild(am4charts.CircleBullet)
         // arrowRight.fill = am4core.color("white")
         // arrowRight.strokeWidth = 0
@@ -214,7 +214,20 @@ export const AmChartsComponent = () => {
         // arrowLeftImage.path = "M0.999969 7L3.99997 4L0.999969 1"
         // arrowLeftImage.stroke = am4core.color(colors.blue500)`
 
-        series.bullets.create(am4charts.Bullet)
+        const bulletContainer = series.bullets.create(am4charts.Bullet)
+
+        bulletContainer.events.on('drag', ({target, point}) => {
+          const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
+          if (series.bullets.values[0]) {
+            const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
+            if (bullet) {
+              bullet.setElement(scrubber.element)
+              bullet.stroke = am4core.color(colors.blue500);
+              bullet.width = 14;
+              bullet.fill = am4core.color(colors.sand500);
+            }
+          }
+        }, this)
 
         chart.plotContainer.events.on("hit", ({target, point}) => {
           const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
@@ -229,20 +242,6 @@ export const AmChartsComponent = () => {
             }
           }
         }, this)
-
-        // chart.plotContainer.events.on("drag", ({target, point}) => {
-        //   const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
-        //   if (series.bullets.values[0]) {
-        //     const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
-        //     if (bullet) {
-        //       console.log('');
-        //       bullet.setElement(scrubber.element)
-        //       bullet.stroke = am4core.color(colors.blue500);
-        //       bullet.width = 14;
-        //       bullet.fill = am4core.color(colors.sand500);
-        //     }
-        //   }
-        // }, this)
       }
     }
   }, [amChart]);
