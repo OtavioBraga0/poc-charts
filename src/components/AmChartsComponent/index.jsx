@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -12,13 +12,10 @@ am4core.useTheme(am4themes_animated);
 
 export const AmChartsComponent = () => {
   const amChart = useRef();
-  const [height, setHeight] = useState(800) 
+  const [height, setHeight] = useState(800);
 
   useEffect(() => {
-    amChart.current = am4core.create(
-      "chartdiv",
-      am4charts.XYChart
-    );
+    amChart.current = am4core.create("chartdiv", am4charts.XYChart);
 
     return () => {
       if (amChart.current) {
@@ -26,6 +23,12 @@ export const AmChartsComponent = () => {
       }
     };
   }, [amChart]);
+
+  const createCustomBullet = useCallback((bullet) => {
+    bullet.stroke = am4core.color(colors.blue500);
+    bullet.width = 14;
+    bullet.fill = am4core.color(colors.sand500);
+  }, []);
 
   useEffect(() => {
     if (amChart.current) {
@@ -83,7 +86,7 @@ export const AmChartsComponent = () => {
               "any"
             )
           );
-          return dataItem
+          return dataItem;
         };
 
         const series = new am4charts.LineSeries();
@@ -192,64 +195,94 @@ export const AmChartsComponent = () => {
 
         const scrubber = new am4charts.CircleBullet();
 
-        // const arrowRight = plot.createChild(am4charts.CircleBullet)
-        // arrowRight.fill = am4core.color("white")
-        // arrowRight.strokeWidth = 0
-        // arrowRight.width = 16
-        // arrowRight.dx = 23
-        // arrowRight.align = "center"
-        // arrowRight.valign = "middle"
+        // console.log("lalal");
 
-        // const arrowRightImage = arrowRight.createChild(am4core.Image)
-        // arrowRightImage.path = "M0.999969 7L3.99997 4L0.999969 1"
-        // arrowRightImage.stroke = am4core.color(colors.blue500)
+        const arrowRight = scrubber.createChild(am4charts.CircleBullet);
+        arrowRight.fill = am4core.color("white");
+        arrowRight.strokeWidth = 0;
+        arrowRight.width = 16;
+        arrowRight.dx = 23;
 
-        // const arrowLeft = plot.createChild(am4charts.CircleBullet)
-        // arrowLeft.fill = am4core.color("white")
-        // arrowLeft.strokeWidth = 0
-        // arrowLeft.width = 16
-        // arrowLeft.dx = -23
+        const arrowRightImage = arrowRight.createChild(am4core.Image);
+        arrowRightImage.path = "M0.999969 7L3.99997 4L0.999969 1";
+        arrowRightImage.stroke = am4core.color(colors.blue500);
+        arrowRightImage.fill = am4core.color(colors.blue500);
 
-        // const arrowLeftImage = arrowLeft.createChild(am4core.Image)
-        // arrowLeftImage.path = "M0.999969 7L3.99997 4L0.999969 1"
-        // arrowLeftImage.stroke = am4core.color(colors.blue500)`
+        const arrowLeft = scrubber.createChild(am4charts.CircleBullet);
+        arrowLeft.fill = am4core.color("white");
+        arrowLeft.strokeWidth = 0;
+        arrowLeft.width = 16;
+        arrowLeft.dx = -23;
 
-        const bulletContainer = series.bullets.create(am4charts.Bullet)
+        const arrowLeftImage = arrowLeft.createChild(am4core.Image);
+        arrowLeftImage.path = "M0.999969 7L3.99997 4L0.999969 1";
+        arrowLeftImage.stroke = am4core.color(colors.blue500);
+        arrowLeftImage.fill = am4core.color(colors.blue500);
+        arrowLeftImage.rotation = 180;
 
-        bulletContainer.events.on('drag', ({target, point}) => {
-          const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
-          if (series.bullets.values[0]) {
-            const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
-            if (bullet) {
-              bullet.setElement(scrubber.element)
-              bullet.stroke = am4core.color(colors.blue500);
-              bullet.width = 14;
-              bullet.fill = am4core.color(colors.sand500);
+        series.bullets.create(am4charts.Bullet);
+
+        chart.plotContainer.dragStart = ({ event }) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        };
+        chart.plotContainer.handleDragMove = ({ event }) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        };
+        chart.plotContainer.dragStop = ({ event }) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        };
+
+        chart.plotContainer.events.on(
+          "drag",
+          ({ target, point }) => {
+            const dataItem = valueAxis.getSeriesDataItem(
+              target.baseSprite.series.values[0],
+              point
+            );
+            if (series.bullets.values[0]) {
+              const bullet = series.bullets.values[0]._clones.getIndex(
+                dataItem.component.tooltipDataItem.index
+              );
+              if (bullet) {
+                bullet.setElement(scrubber.element);
+                createCustomBullet(bullet);
+              }
             }
-          }
-        }, this)
+          },
+          this
+        );
 
-        chart.plotContainer.events.on("hit", ({target, point}) => {
-          const dataItem = valueAxis.getSeriesDataItem(target.baseSprite.series.values[0], point)
-          if (series.bullets.values[0]) {
-            const bullet = series.bullets.values[0]._clones.getIndex(dataItem.component.tooltipDataItem.index)
-            if (bullet) {
-              // console.log('');
-              bullet.setElement(scrubber.element)
-              bullet.stroke = am4core.color(colors.blue500);
-              bullet.width = 14;
-              bullet.fill = am4core.color(colors.sand500);
+        chart.plotContainer.events.on(
+          "hit",
+          ({ target, point }) => {
+            const dataItem = valueAxis.getSeriesDataItem(
+              target.baseSprite.series.values[0],
+              point
+            );
+            if (series.bullets.values[0]) {
+              const bullet = series.bullets.values[0]._clones.getIndex(
+                dataItem.component.tooltipDataItem.index
+              );
+              if (bullet) {
+                // console.log('');
+                bullet.setElement(scrubber.element);
+                createCustomBullet(bullet);
+              }
             }
-          }
-        }, this)
+          },
+          this
+        );
       }
     }
-  }, [amChart]);
+  }, [amChart, createCustomBullet]);
 
   return (
     <>
       <div id="chartdiv" style={{ height }} />
-      <button onClick={() => setHeight(prev => prev === 500 ? 800 : 500)}>
+      <button onClick={() => setHeight((prev) => (prev === 500 ? 800 : 500))}>
         Toggle Height
       </button>
     </>
