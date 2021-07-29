@@ -30,6 +30,26 @@ export const AmChartsComponent = () => {
     bullet.fill = am4core.color(colors.sand500);
   }, []);
 
+  const handleDragMove = useCallback(
+    (target, point, series, valueAxis, scrubber) => {
+      const dataItem = valueAxis.getSeriesDataItem(
+        target.baseSprite.series.values[0],
+        point
+      );
+      if (series.bullets.values[0]) {
+        const bullet = series.bullets.values[0]._clones.getIndex(
+          dataItem.component.tooltipDataItem.index
+        );
+        if (bullet) {
+          // console.log('');
+          bullet.setElement(scrubber.element);
+          createCustomBullet(bullet);
+        }
+      }
+    },
+    [createCustomBullet]
+  );
+
   useEffect(() => {
     if (amChart.current) {
       const chart = amChart.current;
@@ -235,49 +255,24 @@ export const AmChartsComponent = () => {
           event.stopImmediatePropagation();
         };
 
+        console.log("");
+
         chart.plotContainer.events.on(
           "drag",
-          ({ target, point }) => {
-            const dataItem = valueAxis.getSeriesDataItem(
-              target.baseSprite.series.values[0],
-              point
-            );
-            if (series.bullets.values[0]) {
-              const bullet = series.bullets.values[0]._clones.getIndex(
-                dataItem.component.tooltipDataItem.index
-              );
-              if (bullet) {
-                bullet.setElement(scrubber.element);
-                createCustomBullet(bullet);
-              }
-            }
-          },
+          ({ target, point }) =>
+            handleDragMove(target, point, series, valueAxis, scrubber),
           this
         );
 
         chart.plotContainer.events.on(
           "hit",
-          ({ target, point }) => {
-            const dataItem = valueAxis.getSeriesDataItem(
-              target.baseSprite.series.values[0],
-              point
-            );
-            if (series.bullets.values[0]) {
-              const bullet = series.bullets.values[0]._clones.getIndex(
-                dataItem.component.tooltipDataItem.index
-              );
-              if (bullet) {
-                // console.log('');
-                bullet.setElement(scrubber.element);
-                createCustomBullet(bullet);
-              }
-            }
-          },
+          ({ target, point }) =>
+            handleDragMove(target, point, series, valueAxis, scrubber),
           this
         );
       }
     }
-  }, [amChart, createCustomBullet]);
+  }, [amChart, handleDragMove]);
 
   return (
     <>
