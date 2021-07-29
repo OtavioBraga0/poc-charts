@@ -13,6 +13,7 @@ am4core.useTheme(am4themes_animated);
 export const AmChartsComponent = () => {
   const amChart = useRef();
   const [height, setHeight] = useState(800);
+  const [value, setValue] = useState(0);
 
   useEffect(() => {
     amChart.current = am4core.create("chartdiv", am4charts.XYChart);
@@ -23,12 +24,6 @@ export const AmChartsComponent = () => {
       }
     };
   }, [amChart]);
-
-  const createCustomBullet = useCallback((bullet) => {
-    bullet.stroke = am4core.color(colors.blue500);
-    bullet.width = 14;
-    bullet.fill = am4core.color(colors.sand500);
-  }, []);
 
   const handleDragMove = useCallback(
     (target, point, series, valueAxis, scrubber) => {
@@ -41,13 +36,12 @@ export const AmChartsComponent = () => {
           dataItem.component.tooltipDataItem.index
         );
         if (bullet) {
-          // console.log('');
           bullet.setElement(scrubber.element);
-          createCustomBullet(bullet);
+          setValue(bullet.dataItem.dataContext.total);
         }
       }
     },
-    [createCustomBullet]
+    []
   );
 
   useEffect(() => {
@@ -213,32 +207,42 @@ export const AmChartsComponent = () => {
         endLine.valign = "middle";
         endLine.zIndex = 1;
 
-        const scrubber = new am4charts.CircleBullet();
+        const scrubber = new am4charts.Bullet();
 
-        // console.log("lalal");
+        const mainBullet = scrubber.createChild(am4charts.CircleBullet);
+        mainBullet.stroke = am4core.color(colors.blue500);
+        mainBullet.strokeWidth = 2;
+        mainBullet.circle.radius = 5;
+        mainBullet.fill = am4core.color(colors.sand500);
 
         const arrowRight = scrubber.createChild(am4charts.CircleBullet);
         arrowRight.fill = am4core.color("white");
         arrowRight.strokeWidth = 0;
-        arrowRight.width = 16;
-        arrowRight.dx = 23;
+        arrowRight.circle.radius = 5;
+        arrowRight.dx = 20;
+        arrowRight.horizontalCenter = "middle";
+        arrowRight.verticalCenter = "middle";
 
         const arrowRightImage = arrowRight.createChild(am4core.Image);
         arrowRightImage.path = "M0.999969 7L3.99997 4L0.999969 1";
         arrowRightImage.stroke = am4core.color(colors.blue500);
         arrowRightImage.fill = am4core.color(colors.blue500);
+        arrowRightImage.dy = -4;
+        arrowRightImage.dx = -2;
 
         const arrowLeft = scrubber.createChild(am4charts.CircleBullet);
         arrowLeft.fill = am4core.color("white");
         arrowLeft.strokeWidth = 0;
-        arrowLeft.width = 16;
-        arrowLeft.dx = -23;
+        arrowLeft.circle.radius = 5;
+        arrowLeft.dx = -20;
 
         const arrowLeftImage = arrowLeft.createChild(am4core.Image);
         arrowLeftImage.path = "M0.999969 7L3.99997 4L0.999969 1";
         arrowLeftImage.stroke = am4core.color(colors.blue500);
         arrowLeftImage.fill = am4core.color(colors.blue500);
         arrowLeftImage.rotation = 180;
+        arrowLeftImage.dy = 4;
+        arrowLeftImage.dx = 2;
 
         series.bullets.create(am4charts.Bullet);
 
@@ -280,6 +284,8 @@ export const AmChartsComponent = () => {
       <button onClick={() => setHeight((prev) => (prev === 500 ? 800 : 500))}>
         Toggle Height
       </button>
+      <br />
+      <h2 style={{ fontFamily: "Roboto, sans-serif" }}>{value}</h2>
     </>
   );
 };
