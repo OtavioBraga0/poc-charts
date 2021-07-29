@@ -155,8 +155,6 @@ export const AmChartsComponent = () => {
         scrollbarX.series.push(series);
         scrollbarX.series.push(forecastLowRangeSeries);
         scrollbarX.series.push(forecastHighRangeSeries);
-        scrollbarX.end = 0.45;
-        scrollbarX.start = 0.55;
         scrollbarX.thumb.background.fill = am4core.color(colors.green500);
         scrollbarX.unselectedOverlay.fill = am4core.color("#fff");
         scrollbarX.unselectedOverlay.fillOpacity = 0.8;
@@ -244,7 +242,7 @@ export const AmChartsComponent = () => {
         arrowLeftImage.dy = 4;
         arrowLeftImage.dx = 2;
 
-        series.bullets.create(am4charts.Bullet);
+        series.bullets.push(new am4charts.Bullet());
 
         chart.plotContainer.dragStart = ({ event }) => {
           event.preventDefault();
@@ -259,8 +257,8 @@ export const AmChartsComponent = () => {
           event.stopImmediatePropagation();
         };
 
-        console.log("");
-
+        // scrollbarX.end = 0.45;
+        // scrollbarX.start = 0.55;
         chart.plotContainer.events.on(
           "drag",
           ({ target, point }) =>
