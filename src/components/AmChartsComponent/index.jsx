@@ -122,6 +122,8 @@ export const AmChartsComponent = () => {
         series.tooltip.stroke = am4core.color(colors.blue500);
         series.tooltip.strokeWidth = 2;
 
+        series.bullets.push(new am4charts.Bullet());
+
         chart.series.push(series);
 
         const gradient = new am4core.LinearGradient();
@@ -242,8 +244,6 @@ export const AmChartsComponent = () => {
         arrowLeftImage.dy = 4;
         arrowLeftImage.dx = 2;
 
-        series.bullets.push(new am4charts.Bullet());
-
         chart.plotContainer.dragStart = ({ event }) => {
           event.preventDefault();
           event.stopImmediatePropagation();
@@ -257,8 +257,15 @@ export const AmChartsComponent = () => {
           event.stopImmediatePropagation();
         };
 
-        // scrollbarX.end = 0.45;
-        // scrollbarX.start = 0.55;
+        series.events.on(
+          "appeared",
+          () => {
+            scrollbarX.end = 0.45;
+            scrollbarX.start = 0.55;
+          },
+          this
+        );
+
         chart.plotContainer.events.on(
           "drag",
           ({ target, point }) =>
