@@ -3,10 +3,16 @@ import React, { useCallback, useEffect, useRef } from "react";
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import { highForecast, lowForecast, mockedData as data } from "../../data";
+import {
+  highForecast,
+  lowForecast,
+  mockedData as data,
+  mockedData,
+} from "../../data";
 
 import { colors } from "../constants";
 import { useState } from "react";
+import moment from "moment";
 
 am4core.useTheme(am4themes_animated);
 
@@ -262,6 +268,17 @@ export const AmChartsComponent = () => {
           () => {
             scrollbarX.end = 0.45;
             scrollbarX.start = 0.55;
+            const startingPointIndex = mockedData.findIndex(
+              (data) => data.date === moment().format("YYYY-MM-DD")
+            );
+            const bullet =
+              series.bullets.values[0]._clones.getIndex(startingPointIndex);
+            if (bullet) {
+              bullet.setElement(scrubber.element);
+              setValue(bullet.dataItem.dataContext.total);
+            }
+
+            series.dummyData = { ...series.dummyData, startingPointIndex };
           },
           this
         );
