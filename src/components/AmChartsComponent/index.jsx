@@ -114,7 +114,6 @@ export const AmChartsComponent = () => {
         series.strokeWidth = 2;
         series.stroke = am4core.color(colors.blue500);
         series.fillOpacity = 1;
-        series.tensionX = 0.8;
 
         series.tooltipHTML = `<li>Past / Projected Data: <b>{total}</b></li>`;
         series.tooltip.getFillFromObject = false;
@@ -132,7 +131,7 @@ export const AmChartsComponent = () => {
 
         const gradient = new am4core.LinearGradient();
         gradient.rotation = 90;
-        gradient.addColor(am4core.color(colors.green500));
+        gradient.addColor(am4core.color(colors.green500, 0.5));
         gradient.addColor(am4core.color(colors.sand500));
 
         series.fill = gradient;
@@ -154,9 +153,8 @@ export const AmChartsComponent = () => {
         forecastHighRangeSeries.dataFields.valueY = "total";
         forecastHighRangeSeries.dataFields.dateX = "date";
         forecastHighRangeSeries.name = "high forecast";
-        forecastHighRangeSeries.strokeWidth = 1;
+        forecastHighRangeSeries.strokeWidth = 2;
         forecastHighRangeSeries.stroke = am4core.color(colors.grey500);
-        forecastHighRangeSeries.tensionX = 0.77;
         chart.series.push(forecastHighRangeSeries);
 
         const forecastLowRangeSeries = new am4charts.LineSeries();
@@ -164,18 +162,15 @@ export const AmChartsComponent = () => {
         forecastLowRangeSeries.dataFields.valueY = "total";
         forecastLowRangeSeries.dataFields.dateX = "date";
         forecastLowRangeSeries.name = "low forecast";
-        forecastLowRangeSeries.strokeWidth = 1;
+        forecastLowRangeSeries.strokeWidth = 2;
         forecastLowRangeSeries.stroke = am4core.color(colors.grey500);
-        forecastLowRangeSeries.tensionX = 0.77;
         chart.series.push(forecastLowRangeSeries);
 
         const scrollbarX = new am4charts.XYChartScrollbar();
         scrollbarX.series.push(series);
-        scrollbarX.series.push(forecastLowRangeSeries);
-        scrollbarX.series.push(forecastHighRangeSeries);
-        scrollbarX.thumb.background.fill = am4core.color(colors.green500);
         scrollbarX.unselectedOverlay.fill = am4core.color("#fff");
         scrollbarX.unselectedOverlay.fillOpacity = 0.8;
+        scrollbarX.thumb.minWidth = 150;
 
         chart.scrollbarX = scrollbarX;
         chart.scrollbarX.parent = chart.bottomAxesContainer;
