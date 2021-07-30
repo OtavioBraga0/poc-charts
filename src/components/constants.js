@@ -4,4 +4,5 @@ export const colors = {
   grey500: "#ADB5BD",
   sand500: "#F8F5EE",
   error: "#EA3D44",
+  errorStroke: "#E97063",
 };
