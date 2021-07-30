@@ -266,8 +266,6 @@ export const AmChartsComponent = () => {
         series.events.on(
           "appeared",
           () => {
-            scrollbarX.end = 0.45;
-            scrollbarX.start = 0.55;
             const startingPointIndex = mockedData.findIndex(
               (data) => data.date === moment().format("YYYY-MM-DD")
             );
@@ -296,6 +294,13 @@ export const AmChartsComponent = () => {
             handleDragMove(target, point, series, valueAxis, scrubber),
           this
         );
+
+        chart.events.on("ready", () => {
+          dateAxis.zoomToDates(
+            moment().subtract(3, "M").toDate(),
+            moment().add(3, "M").toDate()
+          );
+        });
       }
     }
   }, [amChart, handleDragMove]);
