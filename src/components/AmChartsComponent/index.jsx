@@ -90,9 +90,6 @@ export const AmChartsComponent = () => {
         valueAxis.renderer.fontWeight = "700";
         valueAxis.renderer.fontSize = 10;
         valueAxis.tooltip = false;
-        valueAxis.strictMinMax = true;
-        valueAxis.extraMin = 0.2;
-        valueAxis.extraMax = 0.2;
 
         valueAxis.getSeriesDataItem = function (series, position) {
           const key = this.axisFieldName + this.axisLetter;
@@ -138,6 +135,13 @@ export const AmChartsComponent = () => {
         gradient.addColor(am4core.color(colors.sand500));
 
         series.fill = gradient;
+
+        const range = valueAxis.createSeriesRange(series);
+        range.value = 0;
+        range.endValue = -100000000;
+        range.contents.stroke = am4core.color("#f00");
+        range.contents.fill = am4core.color("#f00");
+        range.contents.fillOpacity = 0.5;
 
         const forecastHighRangeSeries = new am4charts.LineSeries();
         forecastHighRangeSeries.data = highForecast;
@@ -204,7 +208,6 @@ export const AmChartsComponent = () => {
         endGripImg.strokeWidth = 1;
         endGripImg.stroke = am4core.color(colors.blue500);
 
-        // Add vertical bar
         const endLine = endGrip.createChild(am4core.Rectangle);
         endLine.height = 60;
         endLine.width = 1;
