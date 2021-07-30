@@ -124,6 +124,8 @@ export const AmChartsComponent = () => {
         series.tooltip.label.fontSize = 12;
         series.tooltip.stroke = am4core.color(colors.blue500);
         series.tooltip.strokeWidth = 2;
+        series.tensionX = 0.8;
+        series.tensionY = 1;
 
         series.bullets.push(new am4charts.Bullet());
 
@@ -170,7 +172,6 @@ export const AmChartsComponent = () => {
         scrollbarX.series.push(series);
         scrollbarX.unselectedOverlay.fill = am4core.color("#fff");
         scrollbarX.unselectedOverlay.fillOpacity = 0.8;
-        scrollbarX.thumb.minWidth = 150;
 
         chart.scrollbarX = scrollbarX;
         chart.scrollbarX.parent = chart.bottomAxesContainer;
@@ -301,8 +302,8 @@ export const AmChartsComponent = () => {
 
         chart.events.on("ready", () => {
           dateAxis.zoomToDates(
-            moment().subtract(3, "M").toDate(),
-            moment().add(3, "M").toDate()
+            moment().subtract(3, "months").toDate(),
+            moment().add(3, "months").toDate()
           );
         });
       }
