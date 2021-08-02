@@ -19,7 +19,9 @@ am4core.useTheme(am4themes_animated);
 export const AmChartsComponent = () => {
   const amChart = useRef();
   const [height, setHeight] = useState(800);
-  const [value, setValue] = useState(0);
+  const [toggleEventForm, setToggleEventForm] = useState(false);
+  const [selectedBullet, setSelectedBullet] = useState({ total: 0, date: "" });
+  const [selectedEvent, setSelectedEvent] = useState("Add Staff");
 
   useEffect(() => {
     amChart.current = am4core.create("chartdiv", am4charts.XYChart);
@@ -43,7 +45,7 @@ export const AmChartsComponent = () => {
         );
         if (bullet) {
           bullet.setElement(scrubber.element);
-          setValue(bullet.dataItem.dataContext.total);
+          setSelectedBullet(bullet.dataItem.dataContext);
         }
       }
     },
@@ -107,7 +109,6 @@ export const AmChartsComponent = () => {
         };
 
         const series = new am4charts.LineSeries();
-        series.data = data;
         series.dataFields.valueY = "total";
         series.dataFields.dateX = "date";
         series.name = "series";
@@ -250,6 +251,21 @@ export const AmChartsComponent = () => {
         arrowLeftImage.dy = 4;
         arrowLeftImage.dx = 2;
 
+        const eventBullet = series.bullets.push(new am4charts.CircleBullet());
+        eventBullet.fill = am4core.color("#FFF");
+        eventBullet.stroke = am4core.color(colors.blue500);
+        eventBullet.disabled = true;
+        eventBullet.propertyFields.disabled = "event";
+        eventBullet.circle.radius = 10;
+
+        const eventBulletImage = eventBullet.createChild(am4core.Image);
+        eventBulletImage.path =
+          "M 526 150C 576 150 602 175 601 224C 600 300 600 350 575 525C 570 560 560 575 525 575C 525 575 475 575 475 575C 440 575 430 560 425 525C 400 355 400 300 400 226C 400 175 425 150 475 150M 500 650C 527 650 552 661 571 679C 589 698 600 723 600 750C 600 805 555 850 500 850C 445 850 400 805 400 750C 400 723 411 698 429 679C 448 661 473 650 500 650C 500 650 500 650 500 650";
+        eventBulletImage.heightRatio = 2;
+        eventBulletImage.width = 4;
+
+        eventBulletImage.fill = am4core.color(colors.blue500);
+
         chart.plotContainer.dragStart = ({ event }) => {
           event.preventDefault();
           event.stopImmediatePropagation();
@@ -263,6 +279,14 @@ export const AmChartsComponent = () => {
           event.stopImmediatePropagation();
         };
 
+        chart.events.on(
+          "beforedatavalidated",
+          ({ target }) => {
+            target.data = mockedData;
+          },
+          this
+        );
+
         series.events.on(
           "appeared",
           () => {
@@ -273,7 +297,7 @@ export const AmChartsComponent = () => {
               series.bullets.values[0]._clones.getIndex(startingPointIndex);
             if (bullet) {
               bullet.setElement(scrubber.element);
-              setValue(bullet.dataItem.dataContext.total);
+              setSelectedBullet(bullet.dataItem.dataContext);
             }
 
             series.dummyData = { ...series.dummyData, startingPointIndex };
@@ -295,15 +319,35 @@ export const AmChartsComponent = () => {
           this
         );
 
-        chart.events.on("ready", () => {
+        chart.events.on("appeared", () => {
           dateAxis.zoomToDates(
-            moment().subtract(3, "months").toDate(),
-            moment().add(3, "months").toDate()
+            moment().subtract(1, "months").toDate(),
+            moment().add(1, "months").toDate()
           );
         });
       }
     }
   }, [amChart, handleDragMove]);
+
+  const handleAddNewEvent = useCallback(
+    (event) => {
+      event.preventDefault();
+
+      const selectedDataIndex = mockedData.findIndex(
+        (data) => data === selectedBullet
+      );
+
+      mockedData[selectedDataIndex] = {
+        ...selectedBullet,
+        // event: selectedEvent,
+        event: false,
+      };
+
+      console.log(mockedData[selectedDataIndex]);
+      amChart.current.dispatch("beforedatavalidated");
+    },
+    [selectedEvent, selectedBullet]
+  );
 
   return (
     <>
@@ -311,8 +355,46 @@ export const AmChartsComponent = () => {
       <button onClick={() => setHeight((prev) => (prev === 500 ? 800 : 500))}>
         Toggle Height
       </button>
+      <button onClick={() => setToggleEventForm((prev) => !prev)}>
+        Toggle Event Form
+      </button>
       <br />
-      <h2 style={{ fontFamily: "Roboto, sans-serif" }}>{value}</h2>
+      <h2 style={{ fontFamily: "Roboto, sans-serif" }}>
+        {selectedBullet.total}
+      </h2>
+      {toggleEventForm && (
+        <form
+          onSubmit={handleAddNewEvent}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 15,
+            width: 300,
+          }}
+        >
+          <div>
+            <label style={{ marginRight: 15 }}>Event</label>
+            <select
+              onChange={(event) => setSelectedEvent(event.target.value)}
+              value={selectedEvent}
+            >
+              <option value="Add Staff">Add Staff</option>
+              <option value="Remove Staff">Remove Staff</option>
+              <option value="Add Client">Add Client</option>
+              <option value="Remove Client">Remove Client</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ marginRight: 15 }}>Total</label>
+            <input type="text" value={selectedBullet.total} disabled />
+          </div>
+          <div>
+            <label style={{ marginRight: 15 }}>Date</label>
+            <input type="date" value={selectedBullet.date} disabled />
+          </div>
+          <button type="submit">Add Event</button>
+        </form>
+      )}
     </>
   );
 };
