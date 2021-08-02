@@ -140,15 +140,10 @@ export const AmChartsComponent = () => {
 
         const range = valueAxis.createSeriesRange(series);
         range.value = 0;
-        range.rotation = 90;
         range.endValue = -100000000;
         range.contents.stroke = am4core.color(colors.errorStroke);
-
-        const errorGradient = new am4core.LinearGradient();
-        errorGradient.addColor(am4core.color(colors.error));
-        errorGradient.addColor(am4core.color(colors.sand500));
-
-        range.contents.fill = errorGradient;
+        range.contents.fill = am4core.color(colors.error);
+        range.contents.fillOpacity = 0.3;
 
         const forecastHighRangeSeries = new am4charts.LineSeries();
         forecastHighRangeSeries.data = highForecast;
