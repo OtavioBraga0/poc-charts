@@ -3,16 +3,13 @@ import React, { useCallback, useEffect, useRef } from "react";
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import {
-  highForecast,
-  lowForecast,
-  mockedData as data,
-  mockedData,
-} from "../../data";
+import { highForecast, lowForecast, mockedData } from "../../data";
 
 import { colors } from "../constants";
 import { useState } from "react";
 import moment from "moment";
+
+import eventBulletIcon from "../../assets/eventBulletIcon.svg";
 
 am4core.useTheme(am4themes_animated);
 
@@ -109,12 +106,13 @@ export const AmChartsComponent = () => {
         };
 
         const series = new am4charts.LineSeries();
+        series.data = mockedData;
         series.dataFields.valueY = "total";
         series.dataFields.dateX = "date";
         series.name = "series";
         series.strokeWidth = 2;
         series.stroke = am4core.color(colors.blue500);
-        series.fillOpacity = 1;
+        series.fillOpacity = 0.5;
 
         series.tooltipHTML = `<li>Past / Projected Data: <b>{total}</b></li>`;
         series.tooltip.getFillFromObject = false;
@@ -251,20 +249,14 @@ export const AmChartsComponent = () => {
         arrowLeftImage.dy = 4;
         arrowLeftImage.dx = 2;
 
-        const eventBullet = series.bullets.push(new am4charts.CircleBullet());
-        eventBullet.fill = am4core.color("#FFF");
-        eventBullet.stroke = am4core.color(colors.blue500);
+        const eventBullet = series.bullets.push(new am4core.Image());
+        eventBullet.href = eventBulletIcon;
         eventBullet.disabled = true;
-        eventBullet.propertyFields.disabled = "event";
-        eventBullet.circle.radius = 10;
-
-        const eventBulletImage = eventBullet.createChild(am4core.Image);
-        eventBulletImage.path =
-          "M 526 150C 576 150 602 175 601 224C 600 300 600 350 575 525C 570 560 560 575 525 575C 525 575 475 575 475 575C 440 575 430 560 425 525C 400 355 400 300 400 226C 400 175 425 150 475 150M 500 650C 527 650 552 661 571 679C 589 698 600 723 600 750C 600 805 555 850 500 850C 445 850 400 805 400 750C 400 723 411 698 429 679C 448 661 473 650 500 650C 500 650 500 650 500 650";
-        eventBulletImage.heightRatio = 2;
-        eventBulletImage.width = 4;
-
-        eventBulletImage.fill = am4core.color(colors.blue500);
+        eventBullet.width = 20;
+        eventBullet.height = 20;
+        eventBullet.propertyFields.disabled = "disabledBullet";
+        eventBullet.horizontalCenter = "middle";
+        eventBullet.verticalCenter = "middle";
 
         chart.plotContainer.dragStart = ({ event }) => {
           event.preventDefault();
@@ -278,14 +270,6 @@ export const AmChartsComponent = () => {
           event.preventDefault();
           event.stopImmediatePropagation();
         };
-
-        chart.events.on(
-          "beforedatavalidated",
-          ({ target }) => {
-            target.data = mockedData;
-          },
-          this
-        );
 
         series.events.on(
           "appeared",
@@ -332,21 +316,19 @@ export const AmChartsComponent = () => {
   const handleAddNewEvent = useCallback(
     (event) => {
       event.preventDefault();
-
-      const selectedDataIndex = mockedData.findIndex(
+      const draftMockedData = mockedData;
+      const selectedDataIndex = draftMockedData.findIndex(
         (data) => data === selectedBullet
       );
 
-      mockedData[selectedDataIndex] = {
+      draftMockedData[selectedDataIndex] = {
         ...selectedBullet,
-        // event: selectedEvent,
-        event: false,
+        event: selectedEvent,
+        disabledBullet: false,
       };
-
-      console.log(mockedData[selectedDataIndex]);
-      amChart.current.dispatch("beforedatavalidated");
+      amChart.current.series.values[0].data = mockedData;
     },
-    [selectedEvent, selectedBullet]
+    [selectedBullet, selectedEvent]
   );
 
   return (
