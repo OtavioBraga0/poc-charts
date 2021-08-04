@@ -328,6 +328,7 @@ export const AmChartsComponent = () => {
         disabledBullet: false,
       };
       amChart.current.series.values[0].data = mockedData;
+      amChart.current.series.values[0].appear();
     },
     [selectedBullet, selectedEvent]
   );
