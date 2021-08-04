@@ -19,7 +19,6 @@ export const AmChartsComponent = () => {
   const [toggleEventForm, setToggleEventForm] = useState(false);
   const [selectedBullet, setSelectedBullet] = useState({ total: 0, date: "" });
   const [selectedEvent, setSelectedEvent] = useState("Add Staff");
-  const [dataChanged, setDataChanged] = useState(false);
 
   useEffect(() => {
     amChart.current = am4core.create("chartdiv", am4charts.XYChart);
@@ -291,14 +290,6 @@ export const AmChartsComponent = () => {
           this
         );
 
-        series.events.on(
-          "redraw",
-          () => {
-            console.log("lala");
-          },
-          this
-        );
-
         chart.plotContainer.events.on(
           "drag",
           ({ target, point }) =>
@@ -337,8 +328,6 @@ export const AmChartsComponent = () => {
         disabledBullet: false,
       };
       amChart.current.series.values[0].data = mockedData;
-      setDataChanged(true);
-      amChart.current.series.values[0].appear();
     },
     [selectedBullet, selectedEvent]
   );
