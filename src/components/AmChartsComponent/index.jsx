@@ -19,6 +19,7 @@ export const AmChartsComponent = () => {
   const [toggleEventForm, setToggleEventForm] = useState(false);
   const [selectedBullet, setSelectedBullet] = useState({ total: 0, date: "" });
   const [selectedEvent, setSelectedEvent] = useState("Add Staff");
+  const [dataChanged, setDataChanged] = useState(false);
 
   useEffect(() => {
     amChart.current = am4core.create("chartdiv", am4charts.XYChart);
@@ -48,6 +49,19 @@ export const AmChartsComponent = () => {
     },
     []
   );
+
+  const handleDrawChart = useCallback((series, scrubber) => {
+    const pointIndex = mockedData.findIndex(
+      (data) => data.date === moment().format("YYYY-MM-DD")
+    );
+    series.dummyData = { ...series.dummyData, pointIndex };
+
+    const bullet = series.bullets.values[0]._clones.getIndex(pointIndex);
+    if (bullet) {
+      bullet.setElement(scrubber.element);
+      setSelectedBullet(bullet.dataItem.dataContext);
+    }
+  }, []);
 
   useEffect(() => {
     if (amChart.current) {
@@ -273,18 +287,14 @@ export const AmChartsComponent = () => {
 
         series.events.on(
           "appeared",
-          () => {
-            const startingPointIndex = mockedData.findIndex(
-              (data) => data.date === moment().format("YYYY-MM-DD")
-            );
-            const bullet =
-              series.bullets.values[0]._clones.getIndex(startingPointIndex);
-            if (bullet) {
-              bullet.setElement(scrubber.element);
-              setSelectedBullet(bullet.dataItem.dataContext);
-            }
+          () => handleDrawChart(series, scrubber),
+          this
+        );
 
-            series.dummyData = { ...series.dummyData, startingPointIndex };
+        series.events.on(
+          "redraw",
+          () => {
+            console.log("lala");
           },
           this
         );
@@ -311,7 +321,7 @@ export const AmChartsComponent = () => {
         });
       }
     }
-  }, [amChart, handleDragMove]);
+  }, [amChart, handleDragMove, handleDrawChart]);
 
   const handleAddNewEvent = useCallback(
     (event) => {
@@ -327,6 +337,8 @@ export const AmChartsComponent = () => {
         disabledBullet: false,
       };
       amChart.current.series.values[0].data = mockedData;
+      setDataChanged(true);
+      amChart.current.series.values[0].appear();
     },
     [selectedBullet, selectedEvent]
   );
