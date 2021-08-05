@@ -19,6 +19,10 @@ export const AmChartsComponent = () => {
   const [toggleEventForm, setToggleEventForm] = useState(false);
   const [selectedBullet, setSelectedBullet] = useState({ total: 0, date: "" });
   const [selectedEvent, setSelectedEvent] = useState("Add Staff");
+  const [selectedEventBullet, setSelectedEventBullet] = useState({
+    date: "",
+    total: 0,
+  });
 
   useEffect(() => {
     amChart.current = am4core.create("chartdiv", am4charts.XYChart);
@@ -271,6 +275,14 @@ export const AmChartsComponent = () => {
         eventBullet.horizontalCenter = "middle";
         eventBullet.verticalCenter = "middle";
 
+        eventBullet.events.on(
+          "hit",
+          ({ target }) => {
+            setSelectedEventBullet(target.dataItem.dataContext);
+          },
+          this
+        );
+
         chart.plotContainer.dragStart = ({ event }) => {
           event.preventDefault();
           event.stopImmediatePropagation();
@@ -343,9 +355,20 @@ export const AmChartsComponent = () => {
         Toggle Event Form
       </button>
       <br />
-      <h2 style={{ fontFamily: "Roboto, sans-serif" }}>
+
+      <span style={{ display: "flex", alignItems: "center" }}>
+        <h3 style={{ marginRight: 15, marginTop: 10, marginBottom: 10 }}>
+          Scrubber Value
+        </h3>
         {selectedBullet.total}
-      </h2>
+      </span>
+
+      <span style={{ display: "flex", alignItems: "center" }}>
+        <h3 style={{ marginRight: 15, marginTop: 10, marginBottom: 10 }}>
+          Selected Event Bullet Value
+        </h3>
+        {selectedEventBullet.total}
+      </span>
       {toggleEventForm && (
         <form
           onSubmit={handleAddNewEvent}
